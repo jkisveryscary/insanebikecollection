@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOID GALLERY</title>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #060608;
+      --surface: #0d0d12;
+      --card: #111118;
+      --accent1: #ff2d55;
+      --accent2: #00f5ff;
+      --accent3: #c8ff00;
+      --glow1: rgba(255,45,85,0.6);
+      --glow2: rgba(0,245,255,0.6);
+      --glow3: rgba(200,255,0,0.5);
+      --text: #e8e8f0;
+      --muted: #555570;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 9999;
+      animation: noiseDrift 0.15s steps(1) infinite;
+    }
+
+    @keyframes noiseDrift {
+      0%   { transform: translate(0,0); }
+      25%  { transform: translate(-2px, 1px); }
+      50%  { transform: translate(1px, -2px); }
+      75%  { transform: translate(2px, 1px); }
+      100% { transform: translate(-1px, -1px); }
+    }
+
+    /* ── SCANLINES ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      padding: 60px 40px 40px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .header-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -20%, rgba(255,45,85,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,245,255,0.08) 0%, transparent 60%);
+    }
+
+    .title-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .title-eyebrow {
+      font-size: 11px;
+      letter-spacing: 6px;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeSlideDown 0.6s 0.2s ease forwards;
+    }
+
+    h1 {
+      font-family: 'Black Ops One', cursive;
+      font-size: clamp(56px, 12vw, 120px);
+      line-height: 0.9;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--accent1);
+      position: relative;
+      opacity: 0;
+      animation: titleReveal 0.8s 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+
+    h1 .fill {
+      position: absolute;
+      inset: 0;
+      color: var(--text);
+      -webkit-text-stroke: 0;
+      clip-path: inset(0 100% 0 0);
+      animation: textFill 1.2s 0.8s cubic-bezier(0.77,0,0.18,1) forwards;
+    }
+
+    h1 .glitch {
+      position: absolute;
+      inset: 0;
+      color: var(--accent2);
+      -webkit-text-stroke: 0;
+      opacity: 0;
+      animation: glitchFlicker 4s 2s infinite;
+    }
+
+    @keyframes textFill {
+      to { clip-path: inset(0 0% 0 0); }
+    }
+
+    @keyframes titleReveal {
+      from { opacity: 0; transform: translateY(30px) skewX(-5deg); }
+      to   { opacity: 1; transform: translateY(0) skewX(0deg); }
+    }
+
+    @keyframes glitchFlicker {
+      0%, 94%, 100% { opacity: 0; transform: translate(0,0); }
+      95%  { opacity: 0.8; transform: translate(-4px, 0); clip-path: inset(20% 0 60% 0); }
+      96%  { opacity: 0; }
+      97%  { opacity: 0.6; transform: translate(4px, 2px); clip-path: inset(60% 0 10% 0); }
+      98%  { opacity: 0; }
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      margin-top: 20px;
+      opacity: 0;
+      animation: fadeSlideDown 0.6s 1.2s ease forwards;
+    }
+
+    .header-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent1), var(--accent2), transparent);
+      margin-top: 40px;
+      opacity: 0;
+      animation: lineGrow 1s 1.4s ease forwards;
+    }
+
+    @keyframes lineGrow {
+      from { transform: scaleX(0); opacity: 0; }
+      to   { transform: scaleX(1); opacity: 1; }
+    }
+
+    @keyframes fadeSlideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── GALLERY ── */
+    .gallery {
+      padding: 60px 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      position: relative;
+      background: var(--card);
+      border: 1px solid #1e1e2a;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(60px) rotateX(8deg);
+      animation: cardIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+      transition: border-color 0.4s, box-shadow 0.4s;
+      cursor: pointer;
+    }
+
+    .card:nth-child(1) { animation-delay: 1.6s; }
+    .card:nth-child(2) { animation-delay: 1.8s; }
+    .card:nth-child(3) { animation-delay: 2.0s; }
+    .card:nth-child(4) { animation-delay: 2.2s; }
+    .card:nth-child(5) { animation-delay: 2.4s; }
+    .card:nth-child(6) { animation-delay: 2.6s; }
+
+    /* Alternating accent colors */
+    .card:nth-child(odd)  { --card-accent: var(--accent1); --card-glow: var(--glow1); }
+    .card:nth-child(even) { --card-accent: var(--accent2); --card-glow: var(--glow2); }
+    .card:nth-child(3n)   { --card-accent: var(--accent3); --card-glow: var(--glow3); }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(60px) rotateX(8deg); }
+      to   { opacity: 1; transform: translateY(0) rotateX(0deg); }
+    }
+
+    .card:hover {
+      border-color: var(--card-accent);
+      box-shadow: 0 0 40px var(--card-glow), 0 0 80px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+      z-index: 10;
+    }
+
+    /* Corner brackets */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.4s;
+      z-index: 20;
+      pointer-events: none;
+    }
+    .card::before {
+      top: 8px; left: 8px;
+      border-top: 2px solid var(--card-accent);
+      border-left: 2px solid var(--card-accent);
+      transform: translate(-4px, -4px);
+    }
+    .card::after {
+      bottom: 8px; right: 8px;
+      border-bottom: 2px solid var(--card-accent);
+      border-right: 2px solid var(--card-accent);
+      transform: translate(4px, 4px);
+    }
+    .card:hover::before { opacity: 1; transform: translate(0,0); }
+    .card:hover::after  { opacity: 1; transform: translate(0,0); }
+
+    /* ── IMAGE AREA ── */
+    .card-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.5s;
+      filter: grayscale(30%) contrast(1.05);
+    }
+
+    .card:hover .card-img-wrap img {
+      transform: scale(1.08);
+      filter: grayscale(0%) contrast(1.1) brightness(1.05);
+    }
+
+    /* Glitch strips on hover */
+    .glitch-strip {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--card-accent);
+      opacity: 0;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .glitch-strip:nth-child(1) { top: 20%; animation: none; }
+    .glitch-strip:nth-child(2) { top: 55%; animation: none; }
+    .glitch-strip:nth-child(3) { top: 80%; animation: none; }
+
+    .card:hover .glitch-strip:nth-child(1) { animation: stripFlash 2s 0.1s infinite; }
+    .card:hover .glitch-strip:nth-child(2) { animation: stripFlash 2s 0.4s infinite; }
+    .card:hover .glitch-strip:nth-child(3) { animation: stripFlash 2s 0.7s infinite; }
+
+    @keyframes stripFlash {
+      0%, 90%, 100% { opacity: 0; transform: scaleX(1); }
+      91%  { opacity: 0.9; transform: scaleX(1) translateX(-5px); }
+      92%  { opacity: 0; }
+      93%  { opacity: 0.7; transform: scaleX(0.8) translateX(10px); }
+      94%  { opacity: 0; }
+    }
+
+    /* Color overlay on hover */
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        transparent 40%,
+        color-mix(in srgb, var(--card-accent) 20%, transparent) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.4s;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: 4;
+    }
+    .card:hover .card-overlay { opacity: 1; }
+
+    /* Placeholder images (colorful gradients when no real imgs) */
+    .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Black Ops One', cursive;
+      font-size: 48px;
+      color: rgba(255,255,255,0.06);
+      letter-spacing: 4px;
+    }
+
+    .card:nth-child(1) .placeholder { background: linear-gradient(135deg, #1a0a14 0%, #2d0a1a 50%, #0d0616 100%); }
+    .card:nth-child(2) .placeholder { background: linear-gradient(135deg, #000f18 0%, #001e2d 50%, #000810 100%); }
+    .card:nth-child(3) .placeholder { background: linear-gradient(135deg, #0d1400 0%, #1a2800 50%, #060d00 100%); }
+    .card:nth-child(4) .placeholder { background: linear-gradient(135deg, #14000a 0%, #280010 50%, #0a0007 100%); }
+    .card:nth-child(5) .placeholder { background: linear-gradient(135deg, #050014 0%, #0a0028 50%, #020009 100%); }
+    .card:nth-child(6) .placeholder { background: linear-gradient(135deg, #140e00 0%, #281c00 50%, #0d0900 100%); }
+
+    /* ── CARD META ── */
+    .card-meta {
+      padding: 20px 24px 24px;
+      position: relative;
+    }
+
+    .card-tag {
+      font-size: 9px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .card-title {
+      font-family: 'Black Ops One', cursive;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.7;
+      letter-spacing: 0.5px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #1a1a25;
+    }
+
+    .card-num {
+      font-size: 10px;
+      color: #2a2a3a;
+      letter-spacing: 2px;
+    }
+
+    .card-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      background: transparent;
+      border: 1px solid currentColor;
+      padding: 7px 16px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.3s;
+    }
+
+    .card-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--card-accent);
+      transform: translateX(-101%);
+      transition: transform 0.35s cubic-bezier(0.77,0,0.18,1);
+    }
+
+    .card-btn:hover { color: var(--bg); }
+    .card-btn:hover::before { transform: translateX(0); }
+
+    .card-btn span { position: relative; z-index: 1; }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      overflow: hidden;
+      border-top: 1px solid #1e1e2a;
+      border-bottom: 1px solid #1e1e2a;
+      padding: 14px 0;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: tickerScroll 20s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      font-family: 'Black Ops One', cursive;
+      font-size: 13px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 0 40px;
+      color: var(--muted);
+    }
+
+    .ticker-item span {
+      color: var(--accent1);
+      margin: 0 8px;
+    }
+
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(6,6,8,0.96);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+      backdrop-filter: blur(12px);
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lightbox-inner {
+      position: relative;
+      max-width: min(90vw, 900px);
+      width: 100%;
+      transform: scale(0.85) translateY(40px);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .lightbox.active .lightbox-inner {
+      transform: scale(1) translateY(0);
+    }
+
+    .lightbox-inner img {
+      width: 100%;
+      display: block;
+      border: 1px solid #2a2a3a;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -48px;
+      right: 0;
+      background: none;
+      border: 1px solid var(--accent1);
+      color: var(--accent1);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .lightbox-close:hover {
+      background: var(--accent1);
+      color: var(--bg);
+    }
+
+    .lb-scan {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--accent2);
+      box-shadow: 0 0 20px var(--accent2);
+      animation: lbScanLine 2s linear infinite;
+    }
+
+    @keyframes lbScanLine {
+      from { top: 0; opacity: 1; }
+      to   { top: 100%; opacity: 0; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+    }
+
+    .footer-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent2), var(--accent1), transparent);
+      margin-bottom: 40px;
+    }
+
+    .footer-text {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ── CURSOR TRAIL ── */
+    .cursor-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--accent1);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: background 0.2s;
+    }
+
+    /* ── AMBIENT BLOBS ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.06;
+      animation: blobDrift 15s ease-in-out infinite alternate;
+    }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent1); top: -200px; left: -200px; }
+    .blob-2 { width: 500px; height: 500px; background: var(--accent2); bottom: -200px; right: -100px; animation-delay: -7s; }
+    .blob-3 { width: 400px; height: 400px; background: var(--accent3); top: 40%; left: 30%; animation-delay: -4s; opacity: 0.04; }
+
+    @keyframes blobDrift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    /* ── GRID OVERLAY (subtle) ── */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .gallery { grid-template-columns: 1fr; padding: 40px 20px; }
+      h1 { font-size: 48px; }
+      header { padding: 40px 20px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="grid-overlay"></div>
+  <div class="cursor-dot" id="dot"></div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-inner">
+      <div class="lb-scan"></div>
+      <button class="lightbox-close" id="lbClose">[ CLOSE ]</button>
+      <img id="lbImg" src="" alt="" />
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-bg"></div>
+    <div class="title-wrap">
+      <p class="title-eyebrow">◈ VISUAL ARCHIVE ◈</p>
+      <h1>
+        VOID
+        <div class="fill">VOID</div>
+        <div class="glitch">VOID</div>
+      </h1>
+      <p class="subtitle">// GALLERY — SELECT & ENGAGE //</p>
+    </div>
+    <div class="header-line"></div>
+  </header>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item">VISUAL ARCHIVE <span>✦</span></span>
+      <span class="ticker-item">DARK MATTER <span>✦</span></span>
+      <span class="ticker-item">ZERO SIGNAL <span>✦</span></span>
+      <span class="ticker-item">NEON GHOST <span>✦</span></span>
+      <span class="ticker-item">DEEP VOID <span>✦</span></span>
+      <span class="ticker-item">STATIC DREAMS <span>✦</span></span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item">VISUAL ARCHIVE <span>✦</span></span>
+      <span class="ticker-item">DARK MATTER <span>✦</span></span>
+      <span class="ticker-item">ZERO SIGNAL <span>✦</span></span>
+      <span class="ticker-item">NEON GHOST <span>✦</span></span>
+      <span class="ticker-item">DEEP VOID <span>✦</span></span>
+      <span class="ticker-item">STATIC DREAMS <span>✦</span></span>
+    </div>
+  </div>
+
+  <!-- GALLERY GRID -->
+  <section class="gallery" id="gallery">
+
+    <!-- CARD 1 -->
+    <article class="card" data-src="https://picsum.photos/seed/v1/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v1/900/675" alt="Frame 001" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 01</span>
+        <h2 class="card-title">CRIMSON ECHO</h2>
+        <p class="card-desc">Signal captured in low-light exposure. Remnants of a vanishing frequency across the urban grid.</p>
+        <div class="card-footer">
+          <span class="card-num">001 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- CARD 2 -->
+    <article class="card" data-src="https://picsum.photos/seed/v2/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v2/900/675" alt="Frame 002" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 01</span>
+        <h2 class="card-title">CYAN PROTOCOL</h2>
+        <p class="card-desc">Transmission recovered from sector 7. Data integrity compromised at 14% — beauty intact.</p>
+        <div class="card-footer">
+          <span class="card-num">002 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- CARD 3 -->
+    <article class="card" data-src="https://picsum.photos/seed/v3/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v3/900/675" alt="Frame 003" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 02</span>
+        <h2 class="card-title">ACID TERRAIN</h2>
+        <p class="card-desc">Landscape render from the northern corridor. Shot at 03:47 local time. No witnesses.</p>
+        <div class="card-footer">
+          <span class="card-num">003 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- CARD 4 -->
+    <article class="card" data-src="https://picsum.photos/seed/v4/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v4/900/675" alt="Frame 004" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 02</span>
+        <h2 class="card-title">GHOST STATIC</h2>
+        <p class="card-desc">Residual interference pattern. The machine dreamt this before shutdown. Archived as exhibit D.</p>
+        <div class="card-footer">
+          <span class="card-num">004 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- CARD 5 -->
+    <article class="card" data-src="https://picsum.photos/seed/v5/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v5/900/675" alt="Frame 005" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 03</span>
+        <h2 class="card-title">NEON REMNANT</h2>
+        <p class="card-desc">Post-exposure artifact. Chromatic aberration preserved intentionally. Nothing here is a mistake.</p>
+        <div class="card-footer">
+          <span class="card-num">005 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+    <!-- CARD 6 -->
+    <article class="card" data-src="https://picsum.photos/seed/v6/900/675">
+      <div class="card-img-wrap">
+        <img src="https://picsum.photos/seed/v6/900/675" alt="Frame 006" loading="lazy" />
+        <div class="card-overlay"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+        <div class="glitch-strip"></div>
+      </div>
+      <div class="card-meta">
+        <span class="card-tag">▸ Series 03</span>
+        <h2 class="card-title">VOID SIGNAL</h2>
+        <p class="card-desc">Final transmission. Origin unknown. Frequency matches no known broadcast. Catalogued and sealed.</p>
+        <div class="card-footer">
+          <span class="card-num">006 / 006</span>
+          <button class="card-btn"><span>EXPAND</span></button>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-line"></div>
+    <p class="footer-text">◈ VOID GALLERY — ALL SIGNALS CAPTURED — END OF ARCHIVE ◈</p>
+  </footer>
+
+  <script>
+    // ── CURSOR DOT
+    const dot = document.getElementById('dot');
+    document.addEventListener('mousemove', e => {
+      dot.style.left = e.clientX + 'px';
+      dot.style.top  = e.clientY + 'px';
+    });
+
+    // ── LIGHTBOX
+    const lightbox = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lbImg');
+    const lbClose  = document.getElementById('lbClose');
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
+        const src = card.dataset.src;
+        lbImg.src = src;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+      setTimeout(() => { lbImg.src = ''; }, 400);
+    }
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    // ── CARD 3D TILT
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width  - 0.5;
+        const y = (e.clientY - rect.top)  / rect.height - 0.5;
+        card.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 6}deg) translateZ(10px)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+        card.style.transition = 'transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), border-color 0.4s, box-shadow 0.4s';
+      });
+      card.addEventListener('mouseenter', () => {
+        card.style.transition = 'transform 0.1s linear, border-color 0.4s, box-shadow 0.4s';
+      });
+    });
+
+    // ── SCROLL REVEAL (re-trigger for elements below fold)
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card').forEach(c => {
+      c.style.animationPlayState = 'paused';
+      observer.observe(c);
+    });
+  </script>
+</body>
+</html>
